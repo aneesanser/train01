@@ -2,8 +2,18 @@ const todoInput = document.getElementById('todoInput');
 const addBtn = document.getElementById('addBtn');
 const todosContainer = document.getElementById('todosContainer');
 const emptyState = document.getElementById('emptyState');
+const liveRegion = document.getElementById('a11y-live-region');
 
 let todos = JSON.parse(localStorage.getItem('accessible-todos') || '[]');
+let editIndex = null;
+
+// Reliable announcement function (works with NVDA, VoiceOver, TalkBack)
+function announce(message) {
+  liveRegion.textContent = '';                // Clear previous
+  requestAnimationFrame(() => {
+    liveRegion.textContent = message;         // Trigger new announcement
+  });
+}
 
 function renderTodos() {
   // Remove old cards
@@ -34,9 +44,24 @@ function renderTodos() {
     `;
 
     // Toggle completed
-    card.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
+    const checkbox = card.querySelector('input[type="checkbox"]');
+    checkbox.addEventListener('change', (e) => {
+      e.stopPropagation();
       todos[index].completed = e.target.checked;
       card.querySelector('.todo-text').classList.toggle('completed', e.target.checked);
+
+      if (e.target.checked) {
+        todoInput.value = todos[index].text;
+        addBtn.textContent = "Update Todo";
+        editIndex = index;
+        announce(`Todo marked as completed: ${todos[index].text}. Press Enter or click Update to edit.`);
+      } else {
+        todoInput.value = '';
+        addBtn.textContent = "Add Todo";
+        editIndex = null;
+        announce(`Todo unmarked as completed: ${todos[index].text}`);
+      }
+
       saveTodos();
     });
 
@@ -46,7 +71,7 @@ function renderTodos() {
       todos.splice(index, 1);
       saveTodos();
       renderTodos();
-      announce(`${deletedText} deleted`);
+      announce(`Todo deleted: ${deletedText}`);
     });
 
     todosContainer.appendChild(card);
@@ -63,22 +88,26 @@ function addTodo() {
     announce('Please enter a todo item');
     return;
   }
-  todos.push({ text, completed: false });
-  todoInput.value = '';
-  saveTodos();
-  renderTodos();
-  announce(`Todo added: ${text}`);
-  todoInput.focus();
-}
 
-function announce(message) {
-  const el = document.createElement('div');
-  el.setAttribute('aria-live', 'polite');
-  el.setAttribute('aria-atomic', 'true');
-  el.className = 'sr-only';
-  el.textContent = message;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 1000);
+  if (editIndex !== null) {
+    const oldText = todos[editIndex].text;
+    todos[editIndex].text = text;
+    todos[editIndex].completed = false;
+    editIndex = null;
+    addBtn.textContent = "Add Todo";
+    todoInput.value = '';
+    saveTodos();
+    renderTodos();
+    announce(`Todo updated from "${oldText}" to "${text}"`);
+  } else {
+    todos.push({ text, completed: false });
+    todoInput.value = '';
+    saveTodos();
+    renderTodos();
+    announce(`Todo added: ${text}`);
+  }
+
+  todoInput.focus();
 }
 
 // Event listeners
@@ -90,6 +119,6 @@ todoInput.addEventListener('keydown', (e) => {
   }
 });
 
-// Initial render + focus
+// Initial render
 renderTodos();
 todoInput.focus();

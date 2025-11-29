@@ -4,11 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Accessible Todo List</title>
-  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
     <h1>My Accessible Todo List</h1>
+
     <div class="add-todo" role="group" aria-label="Add new todo">
       <input
         type="text"
@@ -19,12 +20,17 @@
       />
       <button id="addBtn">Add Todo</button>
     </div>
+
     <section class="todos-grid" id="todosContainer" aria-live="polite">
       <div class="empty-state" id="emptyState">
         No todos yet! Add one above to get started.
       </div>
     </section>
   </div>
-  <script src="./main.js"></script>
+
+  <!-- Permanent live region for screen readers -->
+  <div id="a11y-live-region" class="sr-only" aria-live="polite" aria-atomic="true" role="status"></div>
+
+  <script src="main.js"></script>
 </body>
 </html>

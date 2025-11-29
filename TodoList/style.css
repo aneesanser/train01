@@ -42,7 +42,7 @@ input[type="text"] {
 
 input[type="text"]:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgb(79 70 229 / 0.2);
+  box-shadow: 0 0 0 3px rgba(179, 229, 70, 0.3);
 }
 
 button {
@@ -61,7 +61,7 @@ button:hover, button:focus {
 }
 
 button:focus {
-  outline: 3px solid rgb(79 70 229 / 0.4);
+  outline: 3px solid rgba(179, 229, 70, 0.4);
   outline-offset: 2px;
 }
 
@@ -136,14 +136,17 @@ input[type="checkbox"] {
 }
 
 .sr-only {
-  position: absolute;
-  width: 1px; height: 1px;
-  padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0,0,0,0);
-  white-space: nowrap; border: 0;
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(1px, 1px, 1px, 1px) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }
 
-/* Dark mode support */
+/* Dark mode */
 @media (prefers-color-scheme: dark) {
   body { background: #111827; color: #f3f4f6; }
   .todo-card { background: #1f2937; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3); }
